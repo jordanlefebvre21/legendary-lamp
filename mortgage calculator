@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Property Mortgage & Savings Calculator</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card: #141417;
+      --card-border: #232329;
+      --pill-bg: #1e1e24;
+      --blue-card: #1b2a6b;
+      --blue-border: #2b3f94;
+      --text-main: #f4f4f5;
+      --text-muted: #9ca3af;
+      --track-bg: #2e2e36;
+      --track-fill: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    header {
+      padding: 4px 4px 8px;
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .card.blue {
+      background: linear-gradient(145deg, #1e2f78 0%, var(--blue-card) 100%);
+      border-color: var(--blue-border);
+    }
+
+    .slider-group {
+      margin-bottom: 24px;
+    }
+
+    .slider-group:last-of-type {
+      margin-bottom: 16px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .slider-label {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .value-pill {
+      background: var(--pill-bg);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      min-width: 84px;
+      text-align: center;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--track-bg);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 6px;
+      height: 24px;
+      border-radius: 3px;
+      background: #ffffff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 6px;
+      height: 24px;
+      border: none;
+      border-radius: 3px;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .toggle-label {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: var(--track-bg);
+      transition: 0.2s;
+      border-radius: 24px;
+    }
+
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+
+    .switch input:checked + .switch-slider {
+      background-color: #3b82f6;
+    }
+
+    .switch input:checked + .switch-slider:before {
+      transform: translateX(20px);
+    }
+
+    .metric-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .card.blue .metric-label {
+      color: #c7d2fe;
+    }
+
+    .metric-value {
+      font-size: 2.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      margin-bottom: 6px;
+    }
+
+    .metric-sub {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card.blue .metric-sub {
+      color: #dbeafe;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Property Mortgage & Savings Calculator</h1>
+      <div class="subtitle" id="headerSubtitle">Purchase Price: $1,495,000 · Loan: $1,196,000</div>
+    </header>
+
+    <section class="card">
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-label">Purchase Price</span>
+          <span class="value-pill" id="priceVal">$1,495,000</span>
+        </div>
+        <input type="range" id="priceSlider" min="400000" max="3000000" step="5000" value="1495000" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-label">Deposit Percentage</span>
+          <span class="value-pill" id="depositVal">20%</span>
+        </div>
+        <input type="range" id="depositSlider" min="5" max="50" step="1" value="20" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-label">Interest Rate (p.a.)</span>
+          <span class="value-pill" id="rateVal">6.20%</span>
+        </div>
+        <input type="range" id="rateSlider" min="3.00" max="10.00" step="0.05" value="6.20" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-label">Extra Fortnightly Payment</span>
+          <span class="value-pill" id="extraVal">+$250</span>
+        </div>
+        <input type="range" id="extraSlider" min="0" max="2000" step="50" value="250" />
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">NSW First Home Buyer (under $1M)</span>
+        <label class="switch">
+          <input type="checkbox" id="fhbToggle" />
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="metric-label">Fortnightly Repayment</div>
+      <div class="metric-value" id="fortnightlyVal">$0</div>
+      <div class="metric-sub" id="minRepaymentSub">Min: $0 / fortnight</div>
+    </section>
+
+    <section class="card blue">
+      <div class="metric-label">Total Upfront Cash</div>
+      <div class="metric-value" id="upfrontVal">$0</div>
+      <div class="metric-sub" id="upfrontSub">Deposit + NSW Stamp Duty</div>
+    </section>
+
+    <section class="card">
+      <div class="metric-label">Interest Saved</div>
+      <div class="metric-value" id="interestSavedVal">$0</div>
+      <div class="metric-sub" id="totalInterestSub">Total interest: $0</div>
+    </section>
+
+    <section class="card">
+      <div class="metric-label">Projected Loan Term</div>
+      <div class="metric-value" id="loanTermVal">30.0 yrs</div>
+      <div class="metric-sub" id="yearsSavedSub">0.0 yrs saved</div>
+    </section>
+  </div>
+
+  <script>
+    const els = {
+      price: document.getElementById("priceSlider"),
+      deposit: document.getElementById("depositSlider"),
+      rate: document.getElementById("rateSlider"),
+      extra: document.getElementById("extraSlider"),
+      fhb: document.getElementById("fhbToggle"),
+      priceVal: document.getElementById("priceVal"),
+      depositVal: document.getElementById("depositVal"),
+      rateVal: document.getElementById("rateVal"),
+      extraVal: document.getElementById("extraVal"),
+      headerSubtitle: document.getElementById("headerSubtitle"),
+      fortnightlyVal: document.getElementById("fortnightlyVal"),
+      minRepaymentSub: document.getElementById("minRepaymentSub"),
+      upfrontVal: document.getElementById("upfrontVal"),
+      upfrontSub: document.getElementById("upfrontSub"),
+      interestSavedVal: document.getElementById("interestSavedVal"),
+      totalInterestSub: document.getElementById("totalInterestSub"),
+      loanTermVal: document.getElementById("loanTermVal"),
+      yearsSavedSub: document.getElementById("yearsSavedSub")
+    };
+
+    const fmtCurrency = (n) =>
+      "$" + Math.round(n).toLocaleString("en-AU");
+
+    // 2026-27 Revenue NSW Transfer Duty rates
+    function calculateNSWStampDuty(price, isFHB) {
+      if (isFHB) {
+        if (price <= 800000) return 0;
+        if (price < 1000000) {
+          // Concessional sliding scale between $800k and $1M (full duty at $1M is $39,187)
+          return ((price - 800000) / 200000) * 39187;
+        }
+      }
+
+      if (price <= 18000) return Math.max(20, Math.ceil(price / 100) * 1.25);
+      if (price <= 38000) return 225 + Math.ceil((price - 18000) / 100) * 1.50;
+      if (price <= 103000) return 525 + Math.ceil((price - 38000) / 100) * 1.75;
+      if (price <= 387000) return 1662 + Math.ceil((price - 103000) / 100) * 3.50;
+      if (price <= 1290000) return 11602 + Math.ceil((price - 387000) / 100) * 4.50;
+      if (price <= 3870000) return 52237 + Math.ceil((price - 1290000) / 100) * 5.50;
+      return 194137 + Math.ceil((price - 3870000) / 100) * 7.00;
+    }
+
+    function updateSliderFill(slider) {
+      const min = parseFloat(slider.min);
+      const max = parseFloat(slider.max);
+      const val = parseFloat(slider.value);
+      const pct = ((val - min) / (max - min)) * 100;
+      slider.style.background = `linear-gradient(to right, #ffffff ${pct}%, #2e2e36 ${pct}%)`;
+    }
+
+    function calculate() {
+      const price = parseFloat(els.price.value);
+      const depositPct = parseFloat(els.deposit.value);
+      const annualRate = parseFloat(els.rate.value);
+      const extraFortnightly = parseFloat(els.extra.value);
+      const isFHB = els.fhb.checked;
+
+      // Update slider visuals & pills
+      [els.price, els.deposit, els.rate, els.extra].forEach(updateSliderFill);
+      els.priceVal.textContent = fmtCurrency(price);
+      els.depositVal.textContent = `${depositPct}%`;
+      els.rateVal.textContent = `${annualRate.toFixed(2)}%`;
+      els.extraVal.textContent = `+$${extraFortnightly.toLocaleString("en-AU")}`;
+
+      // Core loan figures (30-year standard term = 780 fortnights)
+      const depositAmount = price * (depositPct / 100);
+      const loanAmount = price - depositAmount;
+      const stampDuty = calculateNSWStampDuty(price, isFHB);
+      const upfrontCash = depositAmount + stampDuty;
+
+      const totalFortnights = 30 * 26;
+      const r = (annualRate / 100) / 26;
+
+      const minRepayment =
+        r === 0
+          ? loanAmount / totalFortnights
+          : (loanAmount * (r * Math.pow(1 + r, totalFortnights))) /
+            (Math.pow(1 + r, totalFortnights) - 1);
+
+      const totalRepayment = minRepayment + extraFortnightly;
+      const baseTotalInterest = minRepayment * totalFortnights - loanAmount;
+
+      // Simulate payoff with extra repayments
+      let balance = loanAmount;
+      let actualInterest = 0;
+      let fortnightsPaid = 0;
+
+      while (balance > 0.01 && fortnightsPaid < totalFortnights) {
+        const interest = balance * r;
+        actualInterest += interest;
+        const principalPaid = totalRepayment - interest;
+        if (principalPaid >= balance) {
+          balance = 0;
+        } else {
+          balance -= principalPaid;
+        }
+        fortnightsPaid++;
+      }
+
+      const interestSaved = Math.max(0, baseTotalInterest - actualInterest);
+      const projectedYears = fortnightsPaid / 26;
+      const yearsSaved = Math.max(0, 30 - projectedYears);
+
+      // Render outputs
+      els.headerSubtitle.textContent = `Purchase Price: ${fmtCurrency(price)} · Loan: ${fmtCurrency(loanAmount)}`;
+      els.fortnightlyVal.textContent = fmtCurrency(totalRepayment);
+      els.minRepaymentSub.textContent = `Min: ${fmtCurrency(minRepayment)} / fortnight`;
+      els.upfrontVal.textContent = fmtCurrency(upfrontCash);
+      els.upfrontSub.textContent = `Deposit ${fmtCurrency(depositAmount)} + NSW Stamp Duty ${fmtCurrency(stampDuty)}`;
+      els.interestSavedVal.textContent = fmtCurrency(interestSaved);
+      els.totalInterestSub.textContent = `Remaining total interest: ${fmtCurrency(actualInterest)}`;
+      els.loanTermVal.textContent = `${projectedYears.toFixed(1)} yrs`;
+      els.yearsSavedSub.textContent = `${yearsSaved.toFixed(1)} yrs saved`;
+    }
+
+    [els.price, els.deposit, els.rate, els.extra, els.fhb].forEach((el) =>
+      el.addEventListener("input", calculate)
+    );
+
+    calculate();
+  </script>
+</body>
+</html>
